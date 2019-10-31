@@ -10,29 +10,43 @@ import PassengerApi from "../api/PassengerApi";
 
 class PassengerScreen extends Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            helper:'Aponte para o QR Code do motorista'
+        }
+    }
+
     onRead = async (e) => {
 
-        if (e.data.includes(';')) {
+        this.setState({
+            helper:'Aguarde...'
+        }, ()=> {
 
-            const datas = e.data.split(';');
+            if (e.data.includes(';')) {
 
-            PassengerApi.validationDriver(datas[0])
-                .then(data => {
-                    if (data.result) {
-                        this.props.navigation.replace('Confirmed', {
-                            idMotorista:datas[0]
-                        });
-                    } else {
-                        alert('QR Code não foi encontrado.');
+                const datas = e.data.split(';');
+
+                PassengerApi.validationDriver(datas[0])
+                    .then(data => {
+                        if (data.result) {
+                            this.props.navigation.replace('Confirmed', {
+                                idMotorista:datas[0]
+                            });
+                        } else {
+                            alert('QR Code não foi encontrado.');
+                            this.props.navigation.pop();
+                        }
+                    })
+                    .catch(e => {
+                        alert(e);
                         this.props.navigation.pop();
-                    }
-                })
-                .catch(e => {
-                    alert(e);
-                });
-        } else {
-            alert('QR Code inválido.');
-        }
+                    });
+            } else {
+                alert('QR Code inválido.');
+                this.props.navigation.pop();
+            }
+        });
    };
 
    render() {
@@ -44,7 +58,7 @@ class PassengerScreen extends Component {
                    checkAndroid6Permissions={true}
                    bottomContent={
                        <View style={styles.content}>
-                           <Text style={styles.helper}>Aponte para o QR Code do motorista</Text>
+                           <Text style={styles.helper}>{this.state.helper}</Text>
                        </View>
                    } />
            </View>
