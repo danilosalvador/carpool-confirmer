@@ -23,8 +23,8 @@ class PassengerScreen extends Component {
                    showMarker={true}
                    checkAndroid6Permissions={true}
                    bottomContent={
-                       <View style={styles.touchable}>
-                           <Text style={styles.text}>Aponte para o QR Code do motorista.</Text>
+                       <View style={styles.content}>
+                           <Text style={styles.helper}>Aponte para o QR Code do motorista</Text>
                        </View>
                    } />
            </View>
@@ -35,15 +35,16 @@ class PassengerScreen extends Component {
 const styles = StyleSheet.create({
    container: {
        flex: 1,
-       flexDirection: "column",
-       backgroundColor: "black"
+       flexDirection:'column',
+       backgroundColor:'black'
      },
-     touchable: {
-       padding: 16
+     content: {
+       padding:40
      },
-     text: {
-       fontSize: 21,
-       color: "rgb(0,122,255)"
+     helper: {
+       fontSize:22,
+       color:'#009648',
+        textAlign:'center'
      },
      cameraContainer: {
        height: Dimensions.get('window').height,
