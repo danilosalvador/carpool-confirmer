@@ -31,7 +31,9 @@ class HomeScreen extends Component {
                             onPress={() => navigation.push('Passenger')}>
                             <Text style={styles.buttonText}>Caroneiro</Text>
                         </TouchableOpacity> 
+                        <Text></Text>
                     </View>
+                    <Text style={styles.developement}>Desenvolvido por Danilo Salvador</Text>
                 </View>
             </ScrollView>
         );
@@ -81,6 +83,12 @@ const styles = StyleSheet.create({
         color:'#fff',
         fontWeight:'bold',
         fontSize:16
+    },
+    developement:{
+        margin:30,
+        fontSize:16,
+        color:'#7a7a7a',
+        fontStyle:'italic'
     }
 });
 
