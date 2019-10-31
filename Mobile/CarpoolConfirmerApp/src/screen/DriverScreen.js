@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import {
     View,
     Text,
-    TouchableOpacity,
     StyleSheet,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Geolocation from '@react-native-community/geolocation';
+import ButtonStyle from '../components/ButtonStyle';
 
 class DriverScreen extends Component {
 
@@ -14,7 +14,8 @@ class DriverScreen extends Component {
         super(props);
         this.state = {
             qrcode:'empty',
-            location:''
+            location:'',
+            loading:false
         }
     }
 
@@ -25,24 +26,35 @@ class DriverScreen extends Component {
     }
 
     shareLocation() {
-        Geolocation.getCurrentPosition(
-            position => {
-                const location = JSON.stringify(position);
-                this.setState({location});
-            },
-            error => alert('Ocorreu um erro ao tentar consultar a localização. Por favor, tente novamente.'),
-            {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
-        );
+        this.setState({
+           loading:true 
+        }, 
+        ()=> {
+            Geolocation.getCurrentPosition(
+                position => {
+                    const location = JSON.stringify(position);
+                    this.setState({location, loading:false});
+                },
+                error => alert('Ocorreu um erro ao tentar consultar a localização. Por favor, tente novamente.'),
+                {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+            );
+        });
     }
 
     displayAction() {
         if (!this.state.location) {
-            return <TouchableOpacity style={styles.button}
-                    onPress={() => this.shareLocation()}>
-                    <Text style={styles.buttonText}>Compartilhar Localização</Text>
-                </TouchableOpacity>
+            return (
+                <ButtonStyle
+                    onPress={() => this.shareLocation()}
+                    title='Compartilhar Localização'
+                    loading={this.state.loading}/>
+            );
         }
-        return <Text style={styles.sharedText}>Localização compartilhada!</Text>
+        return (
+            <View style={styles.sharedContainer}>
+                <Text style={styles.sharedText}>Localização compartilhada!</Text>
+            </View>
+        );
     }
 
     render() {
@@ -72,23 +84,13 @@ const styles = StyleSheet.create({
         fontSize:18,
         textAlign:'center'
     },
-    button:{
-        backgroundColor:'#009648',
-        width:225,
+    sharedContainer:{
         height:60,
-        borderRadius:30,
         marginTop:30,
         alignItems:'center',
         justifyContent:'center'
     },
-    buttonText:{
-        color:'#fff',
-        fontWeight:'bold',
-        fontSize:16
-    },
     sharedText:{
-        height:60,
-        marginTop:30,
         color:'#000',
         fontWeight:'bold',
         fontSize:16

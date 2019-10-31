@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import {
     View,
     Text,
-    TouchableOpacity,
     StyleSheet,
     ImageBackground,
     ScrollView
 } from 'react-native';
-import HeaderTitle from '../components/HeaderTitle'
+import HeaderTitle from '../components/HeaderTitle';
+import ButtonStyle from '../components/ButtonStyle';
 
 class HomeScreen extends Component {
 
@@ -23,15 +23,12 @@ class HomeScreen extends Component {
                     </ImageBackground>
                     <View style={styles.content}>
                         <Text style={styles.helper}>Selecione um perfil abaixo</Text>
-                        <TouchableOpacity style={styles.button}
-                            onPress={() => navigation.push ('Driver')}>
-                            <Text style={styles.buttonText}>Motorista</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.button}
-                            onPress={() => navigation.push('Passenger')}>
-                            <Text style={styles.buttonText}>Caroneiro</Text>
-                        </TouchableOpacity> 
-                        <Text></Text>
+                        <ButtonStyle
+                            onPress={() => navigation.push ('Driver')}
+                            title='Motorista'/>
+                        <ButtonStyle
+                            onPress={() => navigation.push ('Passenger')}
+                            title='Caroneiro'/>
                     </View>
                     <Text style={styles.developement}>Desenvolvido por Danilo Salvador</Text>
                 </View>
@@ -70,23 +67,9 @@ const styles = StyleSheet.create({
         marginTop:30,
         marginBottom:15,
     },
-    button:{
-        backgroundColor:'#009648',
-        width:250,
-        height:60,
-        borderRadius:30,
-        margin:15,
-        alignItems:'center',
-        justifyContent:'center' 
-    },
-    buttonText:{
-        color:'#fff',
-        fontWeight:'bold',
-        fontSize:16
-    },
     developement:{
-        margin:30,
-        fontSize:16,
+        margin:60,
+        fontSize:15,
         color:'#7a7a7a',
         fontStyle:'italic'
     }
