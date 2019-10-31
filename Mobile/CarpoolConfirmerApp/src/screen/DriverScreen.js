@@ -3,10 +3,12 @@ import {
     View,
     Text,
     StyleSheet,
+    ActivityIndicator 
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Geolocation from '@react-native-community/geolocation';
 import ButtonStyle from '../components/ButtonStyle';
+import DriverApi from "../api/DriverApi";
 
 class DriverScreen extends Component {
 
@@ -15,13 +17,39 @@ class DriverScreen extends Component {
         this.state = {
             qrcode:'empty',
             location:'',
+            generating:true,
+            error:false,
             loading:false
         }
     }
 
     componentDidMount() {
+        this.loadData();
+    }
+
+    loadData() {
         this.setState({
-            qrcode:'Agora sim!'
+            generating:true,
+            error:false
+        },
+        () => {
+            const dateTimeRequest = new Date().toISOString();
+            DriverApi.createDriver(dateTimeRequest)
+                .then(id => {
+                    console.warn('id:'+id);
+                    this.setState({
+                        qrcode:`${id};${dateTimeRequest}`,
+                        generating:false,
+                        error:false
+                    });
+                })
+                .catch(e => {
+                    this.setState({
+                        generating:false,
+                        error:true
+                    });
+                    alert(e);
+                });
         });
     }
 
@@ -49,7 +77,7 @@ class DriverScreen extends Component {
                     title='Compartilhar Localização'
                     loading={this.state.loading}/>
             );
-        }
+        } 
         return (
             <View style={styles.sharedContainer}>
                 <Text style={styles.sharedText}>Localização compartilhada!</Text>
@@ -58,15 +86,33 @@ class DriverScreen extends Component {
     }
 
     render() {
-        const { qrcode } = this.state;
+        const { qrcode, generating, error } = this.state;
         return (
             <View style={styles.container}>
-                <Text style={styles.helper}>Mostre para o caroneiro realizar a leitura do QR Code abaixo.</Text>
-                <QRCode 
-                    size={225}
-                    value={qrcode}
-                />
-                { this.displayAction() }
+            {
+                (!error && !generating) &&
+                <View>
+                    <Text style={styles.helper}>Mostre para o caroneiro realizar a leitura do QR Code abaixo.</Text>
+                    <QRCode 
+                        size={225}
+                        value={qrcode}
+                    />
+                    { this.displayAction() }
+                </View>
+            }
+            {
+                (!error && generating) &&
+                <ActivityIndicator
+                    size='large'
+                    color='#009648'/>
+            }
+            {
+                (error && !generating) &&
+                <ButtonStyle
+                    onPress={() => this.loadData()}
+                    title='Carregar novamente'
+                    loading={generating}/>
+            }
             </View>
         );
     }
