@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import ButtonStyle from '../components/ButtonStyle';
+import PassengerApi from "../api/PassengerApi";
 
 class ConfirmedScreen extends Component {
 
@@ -14,7 +15,8 @@ class ConfirmedScreen extends Component {
         super(props);
         this.state = {
             location:'',
-            loading:false
+            loading:false,
+            distance:''
         }
     }
 
@@ -25,11 +27,26 @@ class ConfirmedScreen extends Component {
          ()=> {
             Geolocation.getCurrentPosition(
                 position => {
-                    const location = JSON.stringify(position);
-                    this.setState({location, loading:false});
+                    const location = {
+                        latitude:position.coords.latitude, 
+                        longitude:position.coords.longitude
+                    };
+                    PassengerApi.completedDriver(this.props.navigation.getParam('idMotorista', '0'), location)
+                        .then(data => {
+                            if (data.result) {
+                                this.setState({location, loading:false, distance:data.distance});
+                            }
+                            else {
+                                alert('Não foi possível completar a solicitação. Tente novamente.');
+                                this.setState({location:'', loading:false});
+                            }
+                        });
                 },
-                error => alert('Ocorreu um erro ao tentar consultar a localização. Por favor, tente novamente.'),
-                {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+                error => {
+                    alert('Ocorreu um erro ao tentar consultar sua localização. Por favor, tente novamente.')
+                    this.setState({location:'', loading:false});
+                },
+                {enableHighAccuracy:false, timeout:20000, maximumAge:1000},
             );
         });
     }
@@ -47,7 +64,7 @@ class ConfirmedScreen extends Component {
             <View style={styles.confirmed}>
                 <Image style={styles.pin} source={require('../../resources/images/pin.png')}/>
                 <Text style={styles.confirmedText}>Carona confirmada!</Text>
-                <Text style={styles.confirmedSubText}>Distância do motorista 0 KM</Text>
+                <Text style={styles.confirmedSubText}>Distância do motorista {this.state.distance} KM</Text>
             </View>
         );
     }

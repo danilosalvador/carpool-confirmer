@@ -2,21 +2,23 @@ const server = 'https://us-central1-danilo-salvador.cloudfunctions.net/';
 
 export default class DriverApi {
 
-    static createDriver(dateTimeRequest) {
+    static validationDriver(motoristaId) {
 
-        const uri = server + 'httpDriverCreate';
+        const uri = server + 'httpPassengerValidation';
         
         const requestInfo = {
             method: 'POST',
             body:JSON.stringify({
-                'DateTimeRequest':dateTimeRequest
+                'motoristaId':motoristaId
             }),
             headers: new Headers({
                 "Content-type": "application/json",
               })
         };
+        
         return fetch(uri, requestInfo)
             .then(response => {
+                
                 if (response.ok) {
                     return response.json();
                 }
@@ -24,14 +26,14 @@ export default class DriverApi {
             });
     }
 
-    static locationDriver(id, location) {
+    static completedDriver(motoristaId, location) {
 
-        const uri = server + 'httpDriverLocation';
+        const uri = server + 'httpPassengerCompleted';
         
         const requestInfo = {
             method: 'POST',
             body:JSON.stringify({
-                'motoristaId':id,
+                'motoristaId':motoristaId,
                 'location':{
                     'latitude':location.latitude,
                     'longitude':location.longitude

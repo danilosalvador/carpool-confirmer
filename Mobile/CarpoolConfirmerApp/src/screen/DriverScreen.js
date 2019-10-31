@@ -15,6 +15,7 @@ class DriverScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            motoristaId:'',
             qrcode:'empty',
             location:'',
             generating:true,
@@ -28,17 +29,20 @@ class DriverScreen extends Component {
     }
 
     loadData() {
+
         this.setState({
             generating:true,
             error:false
         },
         () => {
+
             const dateTimeRequest = new Date().toISOString();
+
             DriverApi.createDriver(dateTimeRequest)
-                .then(id => {
-                    console.warn('id:'+id);
+                .then(data => {
                     this.setState({
-                        qrcode:`${id};${dateTimeRequest}`,
+                        motoristaId:data.id,
+                        qrcode:`${data.id};${dateTimeRequest}`,
                         generating:false,
                         error:false
                     });
@@ -60,11 +64,30 @@ class DriverScreen extends Component {
         ()=> {
             Geolocation.getCurrentPosition(
                 position => {
-                    const location = JSON.stringify(position);
-                    this.setState({location, loading:false});
+                    const location = {
+                        latitude:position.coords.latitude, 
+                        longitude:position.coords.longitude
+                    };
+                    DriverApi.locationDriver(
+                        this.state.motoristaId, location)
+                        .then(data => {
+                            if (data.result) {
+                                this.setState({location, loading:false});
+                            } else {
+                                alert('Nâo foi possível enviar sua localização. Tente novamente.');
+                                this.setState({location:'', loading:false});
+                            }
+                        })
+                        .catch(e => {
+                            alert(e);
+                            this.setState({location:'', loading:false});
+                        });
                 },
-                error => alert('Ocorreu um erro ao tentar consultar a localização. Por favor, tente novamente.'),
-                {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+                error => {
+                    alert('Ocorreu um erro ao tentar consultar sua localização. Por favor, tente novamente.')
+                    this.setState({location:'', loading:false});
+                },
+                {enableHighAccuracy:false, timeout:20000, maximumAge:1000},
             );
         });
     }
@@ -91,7 +114,7 @@ class DriverScreen extends Component {
             <View style={styles.container}>
             {
                 (!error && !generating) &&
-                <View>
+                <View style={styles.content}>
                     <Text style={styles.helper}>Mostre para o caroneiro realizar a leitura do QR Code abaixo.</Text>
                     <QRCode 
                         size={225}
@@ -120,6 +143,11 @@ class DriverScreen extends Component {
 
 const styles = StyleSheet.create({
     container:{
+        flex:1,
+        alignItems:'center',
+        justifyContent:'center'
+    },
+    content:{
         flex:1,
         alignItems:'center',
         justifyContent:'center'

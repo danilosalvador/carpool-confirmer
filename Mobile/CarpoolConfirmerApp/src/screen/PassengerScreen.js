@@ -6,13 +6,33 @@ import {
     Dimensions
 } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import PassengerApi from "../api/PassengerApi";
 
 class PassengerScreen extends Component {
 
-   onRead = async (e) => {
-       this.props.navigation.push('Confirmed', {
-           code:e.data
-       });
+    onRead = async (e) => {
+
+        if (e.data.includes(';')) {
+
+            const datas = e.data.split(';');
+
+            PassengerApi.validationDriver(datas[0])
+                .then(data => {
+                    if (data.result) {
+                        this.props.navigation.replace('Confirmed', {
+                            idMotorista:datas[0]
+                        });
+                    } else {
+                        alert('QR Code não foi encontrado.');
+                        this.props.navigation.pop();
+                    }
+                })
+                .catch(e => {
+                    alert(e);
+                });
+        } else {
+            alert('QR Code inválido.');
+        }
    };
 
    render() {
