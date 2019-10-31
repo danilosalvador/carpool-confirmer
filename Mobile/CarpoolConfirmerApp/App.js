@@ -13,6 +13,14 @@ const RootStack = createStackNavigator(
     Driver: DriverScreen,
     Passenger: PassengerScreen,
     Confirmed: ConfirmedScreen
+  },
+  {
+    defaultNavigationOptions: {
+      headerTintColor: '#009648',
+      headerStyle: {
+        backgroundColor: '#fff',
+      },
+    }
   }
 );
 
